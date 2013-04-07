@@ -1,0 +1,10 @@
+{% include testheader.txt %}
+
+<p>Items:</p>
+{% block items %}<p>
+  Title: {{ title }}<br/>
+  Text: {{ text }}<br/>
+  {% block detail %}Detail: {{ detail }}{% endblock %}
+</p>{% endblock %}
+</body>
+</html>
