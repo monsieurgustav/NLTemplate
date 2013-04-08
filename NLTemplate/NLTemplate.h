@@ -28,11 +28,11 @@ struct NLToken {
 class NLTemplateTokenizer {
 protected:
     const std::string text;
+    const std::regex block;
+    const std::regex endblock;
+    const std::regex include;
+    const std::regex var;
     int pos;
-    std::regex block;
-    std::regex endblock;
-    std::regex include;
-    std::regex var;
     NLToken peek;
     bool peeking;
 public:
@@ -68,7 +68,7 @@ public:
 
 class NLTemplateText : public NLTemplateFragment {
 protected:
-    std::string text;
+    const std::string text;
     
 public:
     NLTemplateText( const std::string & text );
@@ -79,7 +79,7 @@ public:
 
 class NLTemplateProperty : public NLTemplateFragment {
 protected:
-    std::string name;
+    const std::string name;
     
 public:
     NLTemplateProperty( const std::string & name );
@@ -105,7 +105,7 @@ public:
 
 class NLTemplateBlock : public NLTemplateNode {
 protected:
-    std::string name;
+    const std::string name;
     bool enabled;
     bool resized;
     std::vector<NLTemplateNode*> nodes;

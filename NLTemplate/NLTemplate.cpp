@@ -27,6 +27,8 @@ NLToken NLTemplateTokenizer::next() {
     token.type = TOKEN_END;
     peek.type = TOKEN_END;
     
+    int textpos = pos;
+    int textlen = 0;
     smatch match;
     
 a:
@@ -47,15 +49,20 @@ a:
             peek.value = match[2];
             pos += match[1].length();
         } else {
-            token.type = TOKEN_TEXT;
-            token.value += text[ pos ];
+            textlen ++;
             pos ++;
             peeking = true;
             goto a;
         }
     }
     
-    return peeking ? token : peek;
+    if ( peeking ) {
+        token.type = TOKEN_TEXT;
+        token.value = text.substr( textpos, textlen );
+        return token;
+    }
+    
+    return peek;
 }
 
 
