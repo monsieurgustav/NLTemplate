@@ -1,4 +1,4 @@
-***NLTemplate - simple template system for C++***
+***NLTemplate - simple HTML template system for C++***
 
 **Features**
 
