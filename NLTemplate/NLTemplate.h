@@ -3,10 +3,12 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include <sstream>
 #include <fstream>
-#include <regex>
+
+#include "NLRegex.h"
+
+
 
 
 enum {
@@ -27,23 +29,25 @@ struct NLToken {
 
 class NLTemplateTokenizer {
 protected:
-    const std::string text;
-    const std::regex block;
-    const std::regex endblock;
-    const std::regex include;
-    const std::regex var;
+    std::string text;
+    NLRegex block;
+    NLRegex endblock;
+    NLRegex include;
+    NLRegex var;
+
     int pos;
     NLToken peek;
     bool peeking;
 public:
-    NLTemplateTokenizer( const std::string & text );
+    NLTemplateTokenizer();
+    void setText( const std::string & text );
     NLToken next();
 };
 
 
 class NLTemplateDictionary {
 public:
-    std::unordered_map<std::string, std::string> properties;
+    std::vector<std::pair<std::string, std::string> > properties;
     
 public:
     const std::string find( const std::string & name ) const;
@@ -117,8 +121,8 @@ public:
     bool isBlockNamed( const std::string & name ) const;
     void enable();
     void disable();
-    void repeat( int n );
-    NLTemplateNode & operator[]( int index );
+    void repeat( size_t n );
+    NLTemplateNode & operator[]( size_t index );
     void render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const;
 };
 
@@ -135,13 +139,13 @@ public:
 
 class NLTemplateLoader {
 public:
-    virtual std::string load( const std::string & name ) = 0;
+    virtual std::string load( const char *name ) = 0;
 };
 
 
 class NLTemplateLoaderFile : public NLTemplateLoader {
 public:
-    std::string load( const std::string & name );
+    std::string load( const char *name );
 };
 
 
@@ -153,9 +157,9 @@ protected:
 public:
     NLTemplate( NLTemplateLoader & loader );
     void clear();
-    void load( const std::string & name );
+    void load( const char *name );
     std::string render() const;
     
 protected:
-    void load_recursive( const std::string & name, std::vector<NLTemplateTokenizer> & files, std::vector<NLTemplateNode*> & nodes );
+    void load_recursive( const char *name, std::vector<NLTemplateTokenizer*> & files, std::vector<NLTemplateNode*> & nodes );
 };

@@ -1,17 +1,23 @@
 #include "NLTemplate.h"
 
+
 using namespace std;
 
 
-NLTemplateTokenizer::NLTemplateTokenizer( const string & text ) :
+
+NLTemplateTokenizer::NLTemplateTokenizer() :
 peeking( false ),
 pos( 0 ),
-text( text ),
-block( "^(\\{\\% block ([a-zA-Z0-9_]*) \\%\\})" ),
-endblock( "^(\\{\\% endblock \\%\\})" ),
-include( "^(\\{\\% include ([a-zA-Z0-9_\\.]*) \\%\\})" ),
-var( "^(\\{\\{ ([a-zA-Z0-9_]*) \\}\\})" )
+block( "^(\\{\\% block ([a-zA-Z0-9_]*) \\%\\}).*" ),
+endblock( "^(\\{\\% endblock \\%\\}).*" ),
+include( "^(\\{\\% include ([a-zA-Z0-9_\\.]*) \\%\\}).*" ),
+var( "^(\\{\\{ ([a-zA-Z0-9_]*) \\}\\}).*" )
 {
+}
+
+
+void NLTemplateTokenizer::setText( const string &text ) {
+    this->text = text;
 }
 
 
@@ -29,25 +35,27 @@ NLToken NLTemplateTokenizer::next() {
     
     int textpos = pos;
     int textlen = 0;
-    smatch match;
+    
+
+    const char *src = this->text.c_str();
     
 a:
     if ( pos < text.length() ) {
-        if ( regex_search( text.begin() + pos, text.end(), match, block ) ) {
+        if ( block.match( src + pos ) ) {
             peek.type = TOKEN_BLOCK;
-            peek.value = match[2];
-            pos += match[1].length();
-        } else if ( regex_search( text.begin() + pos, text.end(), match, endblock ) ) {
+            peek.value = block[ 2 ];
+            pos += block.matchlen( 1 );
+        } else if ( endblock.match( src + pos ) ) {
             peek.type = TOKEN_ENDBLOCK;
-            pos += match[1].length();
-        } else if ( regex_search( text.begin() + pos, text.end(), match, include ) ) {
+            pos += endblock.matchlen( 1 );
+        } else if ( include.match( src + pos ) ) {
             peek.type = TOKEN_INCLUDE;
-            peek.value = match[2];
-            pos += match[1].length();
-        } else if ( regex_search( text.begin() + pos, text.end(), match, var ) ) {
+            peek.value = include[ 2 ];
+            pos += include.matchlen( 1 );
+        } else if ( var.match( src + pos ) ) {
             peek.type = TOKEN_VAR;
-            peek.value = match[2];
-            pos += match[1].length();
+            peek.value = var[ 2 ];
+            pos += var.matchlen( 1 );
         } else {
             textlen ++;
             pos ++;
@@ -55,28 +63,35 @@ a:
             goto a;
         }
     }
-    
+
     if ( peeking ) {
         token.type = TOKEN_TEXT;
         token.value = text.substr( textpos, textlen );
         return token;
     }
-    
+
     return peek;
 }
 
 
 const string NLTemplateDictionary::find( const string & name ) const {
-    auto found = properties.find( name );
-    if ( found != properties.end() ) {
-        return found->second;
+    for ( int i=0; i < properties.size(); i++ ) {
+        if ( properties[ i ].first == name ) {
+            return properties[ i ].second;
+        }
     }
     return "";
 }
 
 
 void NLTemplateDictionary::set( const string & name, const string & value ) {
-    properties[ name ] = value;
+    for ( int i=0; i < properties.size(); i++ ) {
+        if ( properties[ i ].first == name ) {
+            properties[ i ].second = value;
+            return;
+        }
+    }
+    properties.push_back( pair<string, string>( name, value ) );
 }
 
 
@@ -119,8 +134,8 @@ NLTemplateFragment *NLTemplateProperty::copy() const {
 
 
 NLTemplateNode::~NLTemplateNode() {
-    for ( auto fragment : fragments ) {
-        delete fragment;
+    for ( int i=0; i < fragments.size(); i++ ) {
+        delete fragments[ i ];
     }
 }
 
@@ -128,25 +143,25 @@ NLTemplateNode::~NLTemplateNode() {
 NLTemplateFragment *NLTemplateNode::copy() const {
     NLTemplateNode *node = new NLTemplateNode();
     node->properties = properties;
-    for ( auto fragment : fragments ) {
-        node->fragments.push_back( fragment->copy() );
+    for ( int i=0; i < fragments.size(); i++ ) {
+        node->fragments.push_back( fragments[i]->copy() );
     }
     return node;
 }
 
 
 void NLTemplateNode::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
-    for ( auto fragment : fragments ) {
-        fragment->render( output, *this );
+    for ( int i=0; i < fragments.size(); i++ ) {
+        fragments[i]->render( output, *this );
     }
 }
 
 
 
 NLTemplateBlock & NLTemplateNode::block( const string & name ) const {
-    for ( auto fragment : fragments ) {
-        if ( fragment->isBlockNamed( name ) ) {
-            return *dynamic_cast<NLTemplateBlock*>( fragment );
+    for ( int i=0; i < fragments.size(); i++ ) {
+        if ( fragments[i]->isBlockNamed( name ) ) {
+            return *dynamic_cast<NLTemplateBlock*>( fragments[i] );
         }
     }
     throw 0;
@@ -160,16 +175,16 @@ NLTemplateBlock::NLTemplateBlock( const string & name ) : name( name ), enabled(
 NLTemplateFragment *NLTemplateBlock::copy() const {
     NLTemplateBlock *block = new NLTemplateBlock( name );
     block->properties = properties;
-    for ( auto fragment : fragments ) {
-        block->fragments.push_back( fragment->copy() );
+    for ( int i=0; i < fragments.size(); i++ ) {
+        block->fragments.push_back( fragments[i]->copy() );
     }
     return block;
 }
 
 
 NLTemplateBlock::~NLTemplateBlock() {
-    for ( auto node : nodes ) {
-        delete node;
+    for ( int i=0; i < nodes.size(); i++ ) {
+        delete nodes[i];
     }
 }
 
@@ -188,19 +203,19 @@ void NLTemplateBlock::disable() {
     enabled = false;
 }
 
-void NLTemplateBlock::repeat( int n ) {
+void NLTemplateBlock::repeat( size_t n ) {
     resized = true;
-    for ( auto node : nodes ) {
-        delete node;
+    for ( size_t i=0; i < nodes.size(); i++ ) {
+        delete nodes[i];
     }
     nodes.clear();
-    for ( int i=0; i < n; i++ ) {
+    for ( size_t i=0; i < n; i++ ) {
         nodes.push_back( static_cast<NLTemplateNode*>( copy() ) );
     }
 }
 
 
-NLTemplateNode & NLTemplateBlock::operator[]( int index ) {
+NLTemplateNode & NLTemplateBlock::operator[]( size_t index ) {
     return *nodes.at( index );
 }
 
@@ -208,8 +223,8 @@ NLTemplateNode & NLTemplateBlock::operator[]( int index ) {
 void NLTemplateBlock::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
     if ( enabled ) {
         if ( resized ) {
-            for ( auto node : nodes ) {
-                node->render( output, *node );
+            for ( int i=0; i < nodes.size(); i++ ) {
+                nodes[i]->render( output, *nodes[i] );
             }
         } else {
             NLTemplateNode::render( output, *this );
@@ -223,7 +238,7 @@ void NLTemplateOutputString::print( const string & text ) {
 }
 
 
-string NLTemplateLoaderFile::load( const string & name ) {
+string NLTemplateLoaderFile::load( const char *name ) {
     stringstream source;
     source << ifstream( name ).rdbuf();
     return source.str();
@@ -234,12 +249,15 @@ NLTemplate::NLTemplate( NLTemplateLoader & loader ) : NLTemplateBlock( "main" ),
 }
 
 
-void NLTemplate::load_recursive( const string & name, vector<NLTemplateTokenizer> & files, vector<NLTemplateNode*> & nodes ) {
-    files.emplace_back( loader.load( name ) );
+void NLTemplate::load_recursive( const char *name, vector<NLTemplateTokenizer*> & files, vector<NLTemplateNode*> & nodes ) {
+    NLTemplateTokenizer *tokenizer = new NLTemplateTokenizer();
+    tokenizer->setText( loader.load( name ) );
+    files.push_back( tokenizer );
     
     bool done = false;
     while( !done ) {
-        NLToken token = files.back().next();
+        NLToken token = files.back()->next();
+	printf( "token type %d value %s\n", token.type, token.value.c_str() );
         switch ( token.type ) {
             case TOKEN_END:
                 done = true;
@@ -260,21 +278,22 @@ void NLTemplate::load_recursive( const string & name, vector<NLTemplateTokenizer
                 nodes.back()->fragments.push_back( new NLTemplateText( token.value ) );
                 break;
             case TOKEN_INCLUDE:
-                load_recursive( token.value, files, nodes );
+                load_recursive( token.value.c_str(), files, nodes );
                 break;
         }
     }
     
+    delete files.back();
     files.pop_back();
 }
 
 
 void NLTemplate::clear() {
-    for ( auto fragment : fragments ) {
-        delete fragment;
+    for ( int i=0; i < fragments.size(); i++ ) {
+        delete fragments[i];
     }
-    for ( auto node : nodes ) {
-        delete node;
+    for ( int i=0; i < nodes.size(); i++ ) {
+        delete nodes[i];
     }
     nodes.clear();
     fragments.clear();
@@ -282,13 +301,13 @@ void NLTemplate::clear() {
 }
 
 
-void NLTemplate::load( const string & name ) {
+void NLTemplate::load( const char *name ) {
     clear();
     
     vector<NLTemplateNode*> stack;
     stack.push_back( this );
     
-    vector<NLTemplateTokenizer> file_stack;
+    vector<NLTemplateTokenizer*> file_stack;
     
     load_recursive( name, file_stack, stack );
 }

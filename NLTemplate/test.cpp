@@ -15,7 +15,7 @@ int main(int argc, char *argv[] ) {
     for ( int i=0; i < 3; i++ ) {
         t.block( "items" )[ i ].set( "title", titles[ i ] );
         t.block( "items" )[ i ].set( "text", "Lorem Ipsum" );
-        auto & detail = t.block( "items" )[ i ].block( "detail" );
+        NLTemplateBlock & detail = t.block( "items" )[ i ].block( "detail" );
         detail.set( "detail", details[ i ] );
         if ( i==0 ) {
             detail.disable();
