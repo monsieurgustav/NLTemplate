@@ -5,7 +5,7 @@
 - Variable replacement
 - Repeatable or optional blocks
 - File includes
-- Single source file, no external dependencies
+- No external dependencies
 
 **Requirements**
 
