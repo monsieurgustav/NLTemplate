@@ -7,10 +7,6 @@
 - File includes
 - No external dependencies
 
-**Requirements**
-
-Uses some C++11 features.
-
 **Example - code**
 
     #include <iostream>
@@ -30,7 +26,7 @@ Uses some C++11 features.
         for ( int i=0; i < 3; i++ ) {
             t.block( "items" )[ i ].set( "title", titles[ i ] );
             t.block( "items" )[ i ].set( "text", "Lorem Ipsum" );
-            auto & detail = t.block( "items" )[ i ].block( "detail" );
+            NLTemplateBlock & detail = t.block( "items" )[ i ].block( "detail" );
             detail.set( "detail", details[ i ] );
             if ( i==0 ) {
                 detail.disable();
@@ -38,7 +34,6 @@ Uses some C++11 features.
         }
         cout << t.render() << endl;
     }
-
 
 **Example - test.txt**
 
