@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 int main(int argc, char *argv[] ) {
     const char *titles[3] = { "Chico", "Harpo", "Groucho" };
     const char *details[3] = { "Red", "Green", "Blue" };
@@ -21,5 +22,11 @@ int main(int argc, char *argv[] ) {
             detail.disable();
         }
     }
-    cout << t.render() << endl;
+    
+    NLTemplateOutputStdout output;
+//    NLTemplateOutputString output;
+    
+    t.render( output );
+    
+//    cout << output.buf.str() << endl;
 }

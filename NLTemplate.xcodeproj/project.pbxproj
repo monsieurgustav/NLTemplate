@@ -11,7 +11,6 @@
 		F827ACF51711FE10004A2390 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F827ACF31711FE10004A2390 /* test.cpp */; };
 		F827ACF91711FE8E004A2390 /* test.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = F827ACF71711FE82004A2390 /* test.txt */; };
 		F827ACFA1711FE90004A2390 /* testheader.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = F827ACF81711FE82004A2390 /* testheader.txt */; };
-		F8E67D21172675DC0001187F /* NLRegex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8E67D1F172675DC0001187F /* NLRegex.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,8 +34,6 @@
 		F827ACF31711FE10004A2390 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		F827ACF71711FE82004A2390 /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
 		F827ACF81711FE82004A2390 /* testheader.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = testheader.txt; sourceTree = "<group>"; };
-		F8E67D1F172675DC0001187F /* NLRegex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NLRegex.cpp; sourceTree = "<group>"; };
-		F8E67D20172675DC0001187F /* NLRegex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NLRegex.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,8 +67,6 @@
 		F827ACE71711FDC1004A2390 /* NLTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				F8E67D1F172675DC0001187F /* NLRegex.cpp */,
-				F8E67D20172675DC0001187F /* NLRegex.h */,
 				F827ACF11711FE10004A2390 /* NLTemplate.cpp */,
 				F827ACF21711FE10004A2390 /* NLTemplate.h */,
 				F827ACF31711FE10004A2390 /* test.cpp */,
@@ -141,7 +136,6 @@
 			files = (
 				F827ACF41711FE10004A2390 /* NLTemplate.cpp in Sources */,
 				F827ACF51711FE10004A2390 /* test.cpp in Sources */,
-				F8E67D21172675DC0001187F /* NLRegex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

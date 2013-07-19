@@ -14,6 +14,7 @@
 
     using namespace std;
 
+
     int main(int argc, char *argv[] ) {
         const char *titles[3] = { "Chico", "Harpo", "Groucho" };
         const char *details[3] = { "Red", "Green", "Blue" };
@@ -32,7 +33,12 @@
                 detail.disable();
             }
         }
-        cout << t.render() << endl;
+        
+        NLTemplateOutputString output;
+        
+        t.render( output );
+        
+        cout << output.buf.str() << endl;
     }
 
 **Example - test.txt**

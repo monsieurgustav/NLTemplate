@@ -2,12 +2,9 @@
 
 
 #include <string>
-#include <vector>
 #include <sstream>
-#include <fstream>
-
-#include "NLRegex.h"
-
+#include <vector>
+#include <iostream>
 
 
 
@@ -29,18 +26,15 @@ struct NLToken {
 
 class NLTemplateTokenizer {
 protected:
-    std::string text;
-    NLRegex block;
-    NLRegex endblock;
-    NLRegex include;
-    NLRegex var;
-
-    int pos;
+    const char *text;
+    long len;
+    long pos;
     NLToken peek;
     bool peeking;
 public:
-    NLTemplateTokenizer();
-    void setText( const std::string & text );
+    // NLTemplateTokenizer will free() the text on exit
+    NLTemplateTokenizer( const char *text );
+    ~NLTemplateTokenizer();
     NLToken next();
 };
 
@@ -128,6 +122,12 @@ public:
 
 
 
+class NLTemplateOutputStdout : public NLTemplateOutput {
+public:
+    void print( const std::string & text );
+};
+
+
 class NLTemplateOutputString : public NLTemplateOutput {
 public:
     std::stringstream buf;
@@ -139,13 +139,14 @@ public:
 
 class NLTemplateLoader {
 public:
-    virtual std::string load( const char *name ) = 0;
+    // Returns mallocated memory that the consumer must free()
+    virtual const char * load( const char *name ) = 0;
 };
 
 
 class NLTemplateLoaderFile : public NLTemplateLoader {
 public:
-    std::string load( const char *name );
+    const char * load( const char *name );
 };
 
 
@@ -158,7 +159,7 @@ public:
     NLTemplate( NLTemplateLoader & loader );
     void clear();
     void load( const char *name );
-    std::string render() const;
+    void render( NLTemplateOutput & output ) const;
     
 protected:
     void load_recursive( const char *name, std::vector<NLTemplateTokenizer*> & files, std::vector<NLTemplateNode*> & nodes );

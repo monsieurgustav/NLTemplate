@@ -4,24 +4,105 @@
 using namespace std;
 
 
-
-NLTemplateTokenizer::NLTemplateTokenizer() :
-peeking( false ),
-pos( 0 ),
-block( "^(\\{\\% block ([a-zA-Z0-9_]*) \\%\\}).*" ),
-endblock( "^(\\{\\% endblock \\%\\}).*" ),
-include( "^(\\{\\% include ([a-zA-Z0-9_\\.]*) \\%\\}).*" ),
-var( "^(\\{\\{ ([a-zA-Z0-9_]*) \\}\\}).*" )
-{
+static inline bool alphanum( const char c ) {
+    return
+    ( c >= 'a' && c <= 'z' ) ||
+    ( c >= 'A' && c <= 'Z' ) ||
+    ( c >= '0' && c <= '9' ) ||
+    ( c == '_' ) ||
+    ( c == '.' );
 }
 
 
-void NLTemplateTokenizer::setText( const string &text ) {
-    this->text = text;
+static inline long match_var( const char *text, string & result ) {
+    
+    if (text[ 0 ] != '{' ||
+        text[ 1 ] != '{' ||
+        text[ 2 ] != ' ' )
+    {
+        return -1;
+    }
+    
+    const char *var = text + 3;
+    const char *cursor = var;
+    
+    while ( *cursor ) {
+        if (cursor[ 0 ] == ' ' &&
+            cursor[ 1 ] == '}' &&
+            cursor[ 2 ] == '}' )
+        {
+            result = string( var, cursor - var );
+            return cursor + 3 - text;
+        }
+        
+        if ( !alphanum( *cursor ) ) {
+            return -1;
+        }
+        
+        cursor++;
+    }
+    
+    return -1;
+}
+
+
+static inline long match_tag_with_param( const char *tag, const char *text, string & result ) {
+    
+    long taglen = strlen( tag );
+    
+    if (text[ 0 ] != '{' ||
+        text[ 1 ] != '%' ||
+        text[ 2 ] != ' ' ||
+        strncmp( text + 3, tag, taglen ) )
+    {
+        return -1;
+    }
+    
+    const char *param = text + 3 + taglen;
+    
+    if ( *param != ' ' ) {
+        return -1;
+    }
+    
+    param++;
+
+    const char *cursor = param;
+
+    while ( *cursor ) {
+        if (cursor[ 0 ] == ' ' &&
+            cursor[ 1 ] == '%' &&
+            cursor[ 2 ] == '}' )
+        {
+            result = string( param, cursor - param );
+            return cursor + 3 - text;
+        }
+
+        if ( !alphanum( *cursor ) ) {
+            return -1;
+        }
+        
+        cursor++;
+    }
+    
+    return -1;
+}
+
+
+NLTemplateTokenizer::NLTemplateTokenizer( const char *text ) : peeking( false ), pos( 0 ), text( text ), len( strlen( text ) ) {
+}
+
+
+NLTemplateTokenizer::~NLTemplateTokenizer() {
+    free( (void*) text );
 }
 
 
 NLToken NLTemplateTokenizer::next() {
+    static const char * s_endblock = "{% endblock %}";
+    static const char * s_block = "block";
+    static const char * s_include = "include";
+    static const long s_endblock_len = strlen( s_endblock );
+    
     if ( peeking ) {
         peeking = false;
         return peek;
@@ -33,29 +114,24 @@ NLToken NLTemplateTokenizer::next() {
     token.type = TOKEN_END;
     peek.type = TOKEN_END;
     
-    int textpos = pos;
-    int textlen = 0;
-    
-
-    const char *src = this->text.c_str();
+    long textpos = pos;
+    long textlen = 0;
     
 a:
-    if ( pos < text.length() ) {
-        if ( block.match( src + pos ) ) {
+    if ( pos < len ) {
+        long m = match_tag_with_param( s_block, text + pos, peek.value );
+        if ( m > 0 ) {
             peek.type = TOKEN_BLOCK;
-            peek.value = block[ 2 ];
-            pos += block.matchlen( 1 );
-        } else if ( endblock.match( src + pos ) ) {
+            pos += m;
+        } else if ( !strncmp( s_endblock, text + pos, s_endblock_len ) ) {
             peek.type = TOKEN_ENDBLOCK;
-            pos += endblock.matchlen( 1 );
-        } else if ( include.match( src + pos ) ) {
+            pos += s_endblock_len;
+        } else if ( ( m = match_tag_with_param( s_include, text + pos, peek.value ) ) > 0 ) {
             peek.type = TOKEN_INCLUDE;
-            peek.value = include[ 2 ];
-            pos += include.matchlen( 1 );
-        } else if ( var.match( src + pos ) ) {
+            pos += m;
+        } else if ( ( m = match_var( text + pos, peek.value ) ) > 0 ) {
             peek.type = TOKEN_VAR;
-            peek.value = var[ 2 ];
-            pos += var.matchlen( 1 );
+            pos += m;
         } else {
             textlen ++;
             pos ++;
@@ -66,7 +142,7 @@ a:
 
     if ( peeking ) {
         token.type = TOKEN_TEXT;
-        token.value = text.substr( textpos, textlen );
+        token.value = string( text + textpos, textlen );
         return token;
     }
 
@@ -238,10 +314,21 @@ void NLTemplateOutputString::print( const string & text ) {
 }
 
 
-string NLTemplateLoaderFile::load( const char *name ) {
-    stringstream source;
-    source << ifstream( name ).rdbuf();
-    return source.str();
+void NLTemplateOutputStdout::print( const std::string &text ) {
+    cout << text;
+}
+
+
+const char * NLTemplateLoaderFile::load( const char *name ) {
+    FILE *f = fopen( name, "rb" );
+    fseek( f, 0, SEEK_END );
+    long len = ftell( f );
+    fseek( f, 0, SEEK_SET );
+    char *buffer = (char*) malloc( len + 1 );
+    fread( (void*) buffer, len, 1, f );
+    fclose( f );
+    buffer[ len ] = 0;
+    return buffer;
 }
 
 
@@ -250,14 +337,12 @@ NLTemplate::NLTemplate( NLTemplateLoader & loader ) : NLTemplateBlock( "main" ),
 
 
 void NLTemplate::load_recursive( const char *name, vector<NLTemplateTokenizer*> & files, vector<NLTemplateNode*> & nodes ) {
-    NLTemplateTokenizer *tokenizer = new NLTemplateTokenizer();
-    tokenizer->setText( loader.load( name ) );
+    NLTemplateTokenizer *tokenizer = new NLTemplateTokenizer( loader.load( name ) );
     files.push_back( tokenizer );
     
     bool done = false;
     while( !done ) {
         NLToken token = files.back()->next();
-	printf( "token type %d value %s\n", token.type, token.value.c_str() );
         switch ( token.type ) {
             case TOKEN_END:
                 done = true;
@@ -313,9 +398,6 @@ void NLTemplate::load( const char *name ) {
 }
 
 
-string NLTemplate::render() const {
-    //return source.str();
-    NLTemplateOutputString output;
+void NLTemplate::render( NLTemplateOutput & output ) const {
     NLTemplateNode::render( output, *this );
-    return output.buf.str();
 }
