@@ -1,7 +1,7 @@
 #include "NLTemplate.h"
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 
 using namespace std;
