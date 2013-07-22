@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __NLTEMPLATE_H__
+#define __NLTEMPLATE_H__
 
 
 #include <string>
@@ -164,3 +165,6 @@ public:
 protected:
     void load_recursive( const char *name, std::vector<NLTemplateTokenizer*> & files, std::vector<NLTemplateNode*> & nodes );
 };
+
+
+#endif
