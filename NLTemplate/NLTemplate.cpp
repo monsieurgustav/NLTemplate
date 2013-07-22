@@ -91,7 +91,12 @@ static inline long match_tag_with_param( const char *tag, const char *text, stri
 }
 
 
-NLTemplateTokenizer::NLTemplateTokenizer( const char *text ) : peeking( false ), pos( 0 ), text( text ), len( strlen( text ) ) {
+NLTemplateTokenizer::NLTemplateTokenizer( const char *text ) :
+text( text ),
+len( strlen( text ) ),
+pos( 0 ),
+peeking( false )
+{
 }
 
 
@@ -154,7 +159,7 @@ a:
 
 
 const string NLTemplateDictionary::find( const string & name ) const {
-    for ( int i=0; i < properties.size(); i++ ) {
+    for ( size_t i=0; i < properties.size(); i++ ) {
         if ( properties[ i ].first == name ) {
             return properties[ i ].second;
         }
@@ -164,7 +169,7 @@ const string NLTemplateDictionary::find( const string & name ) const {
 
 
 void NLTemplateDictionary::set( const string & name, const string & value ) {
-    for ( int i=0; i < properties.size(); i++ ) {
+    for ( size_t i=0; i < properties.size(); i++ ) {
         if ( properties[ i ].first == name ) {
             properties[ i ].second = value;
             return;
@@ -213,7 +218,7 @@ NLTemplateFragment *NLTemplateProperty::copy() const {
 
 
 NLTemplateNode::~NLTemplateNode() {
-    for ( int i=0; i < fragments.size(); i++ ) {
+    for ( size_t i=0; i < fragments.size(); i++ ) {
         delete fragments[ i ];
     }
 }
@@ -222,25 +227,25 @@ NLTemplateNode::~NLTemplateNode() {
 NLTemplateFragment *NLTemplateNode::copy() const {
     NLTemplateNode *node = new NLTemplateNode();
     node->properties = properties;
-    for ( int i=0; i < fragments.size(); i++ ) {
-        node->fragments.push_back( fragments[i]->copy() );
+    for ( size_t i=0; i < fragments.size(); i++ ) {
+        node->fragments.push_back( fragments[ i ]->copy() );
     }
     return node;
 }
 
 
 void NLTemplateNode::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
-    for ( int i=0; i < fragments.size(); i++ ) {
-        fragments[i]->render( output, *this );
+    for ( size_t i=0; i < fragments.size(); i++ ) {
+        fragments[ i ]->render( output, *this );
     }
 }
 
 
 
 NLTemplateBlock & NLTemplateNode::block( const string & name ) const {
-    for ( int i=0; i < fragments.size(); i++ ) {
-        if ( fragments[i]->isBlockNamed( name ) ) {
-            return *dynamic_cast<NLTemplateBlock*>( fragments[i] );
+    for ( size_t i=0; i < fragments.size(); i++ ) {
+        if ( fragments[ i ]->isBlockNamed( name ) ) {
+            return *dynamic_cast<NLTemplateBlock*>( fragments[ i ] );
         }
     }
     throw 0;
@@ -254,16 +259,16 @@ NLTemplateBlock::NLTemplateBlock( const string & name ) : name( name ), enabled(
 NLTemplateFragment *NLTemplateBlock::copy() const {
     NLTemplateBlock *block = new NLTemplateBlock( name );
     block->properties = properties;
-    for ( int i=0; i < fragments.size(); i++ ) {
-        block->fragments.push_back( fragments[i]->copy() );
+    for ( size_t i=0; i < fragments.size(); i++ ) {
+        block->fragments.push_back( fragments[ i ]->copy() );
     }
     return block;
 }
 
 
 NLTemplateBlock::~NLTemplateBlock() {
-    for ( int i=0; i < nodes.size(); i++ ) {
-        delete nodes[i];
+    for ( size_t i=0; i < nodes.size(); i++ ) {
+        delete nodes[ i ];
     }
 }
 
@@ -285,7 +290,7 @@ void NLTemplateBlock::disable() {
 void NLTemplateBlock::repeat( size_t n ) {
     resized = true;
     for ( size_t i=0; i < nodes.size(); i++ ) {
-        delete nodes[i];
+        delete nodes[ i ];
     }
     nodes.clear();
     for ( size_t i=0; i < n; i++ ) {
@@ -302,8 +307,8 @@ NLTemplateNode & NLTemplateBlock::operator[]( size_t index ) {
 void NLTemplateBlock::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
     if ( enabled ) {
         if ( resized ) {
-            for ( int i=0; i < nodes.size(); i++ ) {
-                nodes[i]->render( output, *nodes[i] );
+            for ( size_t i=0; i < nodes.size(); i++ ) {
+                nodes[ i ]->render( output, *nodes[ i ] );
             }
         } else {
             NLTemplateNode::render( output, *this );
@@ -377,11 +382,11 @@ void NLTemplate::load_recursive( const char *name, vector<NLTemplateTokenizer*> 
 
 
 void NLTemplate::clear() {
-    for ( int i=0; i < fragments.size(); i++ ) {
-        delete fragments[i];
+    for ( size_t i=0; i < fragments.size(); i++ ) {
+        delete fragments[ i ];
     }
-    for ( int i=0; i < nodes.size(); i++ ) {
-        delete nodes[i];
+    for ( size_t i=0; i < nodes.size(); i++ ) {
+        delete nodes[ i ];
     }
     nodes.clear();
     fragments.clear();

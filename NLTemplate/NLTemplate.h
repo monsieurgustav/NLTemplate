@@ -15,7 +15,7 @@ enum {
     TOKEN_BLOCK,
     TOKEN_ENDBLOCK,
     TOKEN_INCLUDE,
-    TOKEN_VAR,
+    TOKEN_VAR
 };
 
 
