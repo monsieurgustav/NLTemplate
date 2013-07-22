@@ -7,6 +7,19 @@
 - File includes
 - No external dependencies
 
+**Installation**
+
+To start using NLTemplate, add NLTemplate.cpp to your project and make sure NLTemplate.h is in your header search path.
+
+**Demo**
+
+If you use Xcode, just open and run the demo project. On the command line, you could run the demo like this:
+
+    git clone git@github.com:catnapgames/NLTemplate.git
+    cd NLTemplate/NLTemplate
+    gcc -Wall -pedantic -o demo -lstdc++ *.cpp
+    ./demo
+
 **Example - code**
 
     #include <iostream>
