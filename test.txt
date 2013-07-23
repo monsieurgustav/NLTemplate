@@ -4,7 +4,7 @@
 {% block items %}<p>
   Title: {{ title }}<br/>
   Text: {{ text }}<br/>
-  {% block detail %}Detail: {{ detail }}{% endblock %}
+  {% block detailblock %}Detail: {{ detail }}{% endblock %}
 </p>{% endblock %}
 </body>
 </html>
