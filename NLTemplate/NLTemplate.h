@@ -52,6 +52,7 @@ public:
 
 class NLTemplateOutput {
 public:
+    virtual ~NLTemplateOutput();
     virtual void print( const std::string & text ) = 0;
 };
 

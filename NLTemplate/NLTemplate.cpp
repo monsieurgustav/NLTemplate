@@ -317,6 +317,10 @@ void NLTemplateBlock::render( NLTemplateOutput & output, const NLTemplateDiction
 }
 
 
+NLTemplateOutput::~NLTemplateOutput() {
+}
+
+
 void NLTemplateOutputString::print( const string & text ) {
     buf << text;
 }
