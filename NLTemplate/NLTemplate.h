@@ -141,6 +141,7 @@ public:
 
 class NLTemplateLoader {
 public:
+    virtual ~NLTemplateLoader();
     // Returns mallocated memory that the consumer must free()
     virtual const char * load( const char *name ) = 0;
 };

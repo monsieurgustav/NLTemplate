@@ -331,6 +331,10 @@ void NLTemplateOutputStdout::print( const std::string &text ) {
 }
 
 
+NLTemplateLoader::~NLTemplateLoader() {
+}
+
+
 const char * NLTemplateLoaderFile::load( const char *name ) {
     FILE *f = fopen( name, "rb" );
     fseek( f, 0, SEEK_END );
