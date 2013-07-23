@@ -183,7 +183,7 @@ NLTemplateFragment::~NLTemplateFragment() {
 }
 
 
-bool NLTemplateFragment::isBlockNamed( const string & name ) const {
+bool NLTemplateFragment::isBlockNamed( const string & ) const {
     return false;
 }
 
@@ -193,7 +193,7 @@ NLTemplateText::NLTemplateText( const string & text ) : text( text ) {
 }
 
 
-void NLTemplateText::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
+void NLTemplateText::render( NLTemplateOutput & output, const NLTemplateDictionary & ) const {
     output.print( text );
 }
 
@@ -234,7 +234,7 @@ NLTemplateFragment *NLTemplateNode::copy() const {
 }
 
 
-void NLTemplateNode::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
+void NLTemplateNode::render( NLTemplateOutput & output, const NLTemplateDictionary & ) const {
     for ( size_t i=0; i < fragments.size(); i++ ) {
         fragments[ i ]->render( output, *this );
     }
@@ -304,7 +304,7 @@ NLTemplateNode & NLTemplateBlock::operator[]( size_t index ) {
 }
 
 
-void NLTemplateBlock::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
+void NLTemplateBlock::render( NLTemplateOutput & output, const NLTemplateDictionary & ) const {
     if ( enabled ) {
         if ( resized ) {
             for ( size_t i=0; i < nodes.size(); i++ ) {
