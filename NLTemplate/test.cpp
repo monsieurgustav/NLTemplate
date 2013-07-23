@@ -4,7 +4,7 @@
 using namespace std;
 
 
-int main(int argc, char *argv[] ) {
+int main(int, char *[] ) {
     const char *titles[3] = { "Chico", "Harpo", "Groucho" };
     const char *details[3] = { "Red", "Green", "Blue" };
 
