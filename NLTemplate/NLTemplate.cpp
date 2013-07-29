@@ -18,7 +18,6 @@ static inline bool alphanum( const char c ) {
 
 
 static inline long match_var( const char *text, string & result ) {
-    
     if (text[ 0 ] != '{' ||
         text[ 1 ] != '{' ||
         text[ 2 ] != ' ' )
@@ -50,17 +49,18 @@ static inline long match_var( const char *text, string & result ) {
 
 
 static inline long match_tag_with_param( const char *tag, const char *text, string & result ) {
-    
-    long taglen = strlen( tag );
-    
     if (text[ 0 ] != '{' ||
         text[ 1 ] != '%' ||
-        text[ 2 ] != ' ' ||
-        strncmp( text + 3, tag, taglen ) )
+        text[ 2 ] != ' ')
     {
         return -1;
     }
-    
+
+    long taglen = strlen( tag );
+    if ( strncmp( text + 3, tag, taglen ) ) {
+        return -1;
+    }
+
     const char *param = text + 3 + taglen;
     
     if ( *param != ' ' ) {
