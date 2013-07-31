@@ -28,7 +28,7 @@ gcc -Wall -pedantic -o demo -lstdc++ *.cpp
 ./demo
 ```
 
-###Example - code###
+###Example###
 
 ``` c++
 #include <iostream>
@@ -100,3 +100,8 @@ int main(int, char *[] ) {
 <html><body>
 <h1>{{ text }}</h1>
 ```
+
+###Note about HTML###
+
+Despite the headline, there is nothing HTML-specific in NLTemplate.
+You can use XML, JSON or plain text as well for your templates.
