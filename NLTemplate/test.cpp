@@ -42,7 +42,7 @@ int main(int, char *[] ) {
     t.render( output );
 
     // Another output method can place the output into a string
-    //NLTemplateOutputString output;
-    //t.render( output );
-    //cout << output.buf.str() << endl;
+    NLTemplateOutputString buffer;
+    t.render( buffer );
+    cout << buffer.buf.str() << endl;
 }
