@@ -104,17 +104,13 @@ static inline long match_tag_with_param( const char *tag, const char *text, stri
 }
 
 
-Tokenizer::Tokenizer( const char *text ) :
-text( text ),
-len( strlen( text ) ),
+Tokenizer::Tokenizer( const std::shared_ptr<char> & text ) :
+text_ptr( text ),
+text( text.get() ),
+len( strlen( text.get() ) ),
 pos( 0 ),
 peeking( false )
 {
-}
-
-
-Tokenizer::~Tokenizer() {
-    free( (void*) text );
 }
 
 
@@ -348,7 +344,7 @@ Loader::~Loader() {
 }
 
 
-const char * LoaderFile::load( const string & name ) {
+std::shared_ptr<char>  LoaderFile::load( const string & name ) {
     FILE *f = fopen( name.c_str(), "rb" );
     fseek( f, 0, SEEK_END );
     long len = ftell( f );
@@ -357,7 +353,7 @@ const char * LoaderFile::load( const string & name ) {
     fread( (void*) buffer, len, 1, f );
     fclose( f );
     buffer[ len ] = 0;
-    return buffer;
+    return shared_ptr<char>( buffer, free );
 }
 
 

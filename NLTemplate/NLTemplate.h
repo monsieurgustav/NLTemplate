@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <memory>
 
 
 namespace NL {
@@ -22,11 +23,11 @@ struct Token {
 
 class Tokenizer {
 public:
-    Tokenizer( const char *text ); // Tokenizer will free() the text on exit
-    ~Tokenizer();
+    Tokenizer( const std::shared_ptr<char> & text ); // Tokenizer will free() the text on exit
     Token next();
     
 private:
+    std::shared_ptr<char> text_ptr;
     const char *text;
     long len;
     long pos;
@@ -139,14 +140,13 @@ public:
 class Loader {
 public:
     virtual ~Loader();
-    // Returns mallocated memory that the consumer must free()
-    virtual const char * load( const std::string & name ) = 0;
+    virtual std::shared_ptr<char> load( const std::string & name ) = 0;
 };
 
 
 class LoaderFile : public Loader {
 public:
-    const char * load( const std::string & name );
+    std::shared_ptr<char> load( const std::string & name );
 };
 
 
