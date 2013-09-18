@@ -21,27 +21,27 @@ struct Token {
 
 
 class Tokenizer {
+public:
+    Tokenizer( const char *text ); // Tokenizer will free() the text on exit
+    ~Tokenizer();
+    Token next();
+    
 private:
     const char *text;
     long len;
     long pos;
     Token peek;
     bool peeking;
-public:
-    // Tokenizer will free() the text on exit
-    Tokenizer( const char *text );
-    ~Tokenizer();
-    Token next();
 };
 
 
 class Dictionary {
 public:
-    std::vector<std::pair<std::string, std::string> > properties;
-    
-public:
     const std::string find( const std::string & name ) const;
     void set( const std::string & name, const std::string & value );
+
+protected:
+    std::vector<std::pair<std::string, std::string> > properties;
 };
 
 
@@ -62,24 +62,24 @@ public:
 
 
 class Text : public Fragment {
-private:
-    const std::string text;
-    
 public:
     Text( const std::string & text );
     void render( Output & output, const Dictionary & dictionary ) const;
     Fragment *copy() const;
+    
+private:
+    const std::string text;
 };
 
 
 class Property : public Fragment {
-private:
-    const std::string name;
-    
 public:
     Property( const std::string & name );
     void render( Output & output, const Dictionary & dictionary ) const;
     Fragment *copy() const;
+    
+private:
+    const std::string name;
 };
 
 
@@ -88,23 +88,19 @@ class Block;
 
 class Node : public Fragment, public Dictionary {
 public:
-    std::vector<Fragment*> fragments;
-    
-public:
     ~Node();
     Fragment *copy() const;
     void render( Output & output, const Dictionary & dictionary ) const;
     Block & block( const std::string & name ) const;
+
+protected:
+    std::vector<Fragment*> fragments;
+    
+    friend class Template;
 };
 
 
 class Block : public Node {
-protected:
-    const std::string name;
-    bool enabled;
-    bool resized;
-    std::vector<Node*> nodes;
-    
 public:
     Block( const std::string & name );
     Fragment *copy() const;
@@ -115,6 +111,12 @@ public:
     void repeat( size_t n );
     Node & operator[]( size_t index );
     void render( Output & output, const Dictionary & dictionary ) const;
+
+protected:
+    const std::string name;
+    bool enabled;
+    bool resized;
+    std::vector<Node*> nodes;
 };
 
 
@@ -150,16 +152,15 @@ public:
 
 
 class Template : public Block {
-protected:
-    Loader & loader;
-    
 public:
     Template( Loader & loader );
     void clear();
     void load( const std::string & name );
     void render( Output & output ) const;
     
-protected:
+private:
+    Loader & loader;
+
     void load_recursive( const std::string & name, std::vector<Tokenizer*> & files, std::vector<Node*> & nodes );
 };
 
