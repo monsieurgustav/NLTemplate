@@ -1,10 +1,23 @@
-#include "NLTemplate.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "NLTemplate.h"
+
 
 using namespace std;
+using namespace NL::Template;
+
+
+
+enum {
+    TOKEN_END,
+    TOKEN_TEXT,
+    TOKEN_BLOCK,
+    TOKEN_ENDBLOCK,
+    TOKEN_INCLUDE,
+    TOKEN_VAR
+};
 
 
 static inline bool alphanum( const char c ) {
@@ -91,7 +104,7 @@ static inline long match_tag_with_param( const char *tag, const char *text, stri
 }
 
 
-NLTemplateTokenizer::NLTemplateTokenizer( const char *text ) :
+Tokenizer::Tokenizer( const char *text ) :
 text( text ),
 len( strlen( text ) ),
 pos( 0 ),
@@ -100,12 +113,12 @@ peeking( false )
 }
 
 
-NLTemplateTokenizer::~NLTemplateTokenizer() {
+Tokenizer::~Tokenizer() {
     free( (void*) text );
 }
 
 
-NLToken NLTemplateTokenizer::next() {
+Token Tokenizer::next() {
     static const char * s_endblock = "{% endblock %}";
     static const char * s_block = "block";
     static const char * s_include = "include";
@@ -116,7 +129,7 @@ NLToken NLTemplateTokenizer::next() {
         return peek;
     }
     
-    NLToken token;
+    Token token;
     token.value.clear();
     peek.value.clear();
     token.type = TOKEN_END;
@@ -158,7 +171,7 @@ a:
 }
 
 
-const string NLTemplateDictionary::find( const string & name ) const {
+const string Dictionary::find( const string & name ) const {
     for ( size_t i=0; i < properties.size(); i++ ) {
         if ( properties[ i ].first == name ) {
             return properties[ i ].second;
@@ -168,7 +181,7 @@ const string NLTemplateDictionary::find( const string & name ) const {
 }
 
 
-void NLTemplateDictionary::set( const string & name, const string & value ) {
+void Dictionary::set( const string & name, const string & value ) {
     for ( size_t i=0; i < properties.size(); i++ ) {
         if ( properties[ i ].first == name ) {
             properties[ i ].second = value;
@@ -179,53 +192,53 @@ void NLTemplateDictionary::set( const string & name, const string & value ) {
 }
 
 
-NLTemplateFragment::~NLTemplateFragment() {
+Fragment::~Fragment() {
 }
 
 
-bool NLTemplateFragment::isBlockNamed( const string & ) const {
+bool Fragment::isBlockNamed( const string & ) const {
     return false;
 }
 
 
 
-NLTemplateText::NLTemplateText( const string & text ) : text( text ) {
+Text::Text( const string & text ) : text( text ) {
 }
 
 
-void NLTemplateText::render( NLTemplateOutput & output, const NLTemplateDictionary & ) const {
+void Text::render( Output & output, const Dictionary & ) const {
     output.print( text );
 }
 
 
-NLTemplateFragment *NLTemplateText::copy() const {
-    return new NLTemplateText( text );
+Fragment *Text::copy() const {
+    return new Text( text );
 }
 
 
-NLTemplateProperty::NLTemplateProperty( const string & name ) : name( name ) {
+Property::Property( const string & name ) : name( name ) {
 }
 
 
-void NLTemplateProperty::render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const {
+void Property::render( Output & output, const Dictionary & dictionary ) const {
     output.print( dictionary.find( name ) );
 }
 
 
-NLTemplateFragment *NLTemplateProperty::copy() const {
-    return new NLTemplateProperty( name );
+Fragment *Property::copy() const {
+    return new Property( name );
 }
 
 
-NLTemplateNode::~NLTemplateNode() {
+Node::~Node() {
     for ( size_t i=0; i < fragments.size(); i++ ) {
         delete fragments[ i ];
     }
 }
 
 
-NLTemplateFragment *NLTemplateNode::copy() const {
-    NLTemplateNode *node = new NLTemplateNode();
+Fragment *Node::copy() const {
+    Node *node = new Node();
     node->properties = properties;
     for ( size_t i=0; i < fragments.size(); i++ ) {
         node->fragments.push_back( fragments[ i ]->copy() );
@@ -234,7 +247,7 @@ NLTemplateFragment *NLTemplateNode::copy() const {
 }
 
 
-void NLTemplateNode::render( NLTemplateOutput & output, const NLTemplateDictionary & ) const {
+void Node::render( Output & output, const Dictionary & ) const {
     for ( size_t i=0; i < fragments.size(); i++ ) {
         fragments[ i ]->render( output, *this );
     }
@@ -242,22 +255,22 @@ void NLTemplateNode::render( NLTemplateOutput & output, const NLTemplateDictiona
 
 
 
-NLTemplateBlock & NLTemplateNode::block( const string & name ) const {
+Block & Node::block( const string & name ) const {
     for ( size_t i=0; i < fragments.size(); i++ ) {
         if ( fragments[ i ]->isBlockNamed( name ) ) {
-            return *dynamic_cast<NLTemplateBlock*>( fragments[ i ] );
+            return *dynamic_cast<Block*>( fragments[ i ] );
         }
     }
     throw 0;
 }
 
 
-NLTemplateBlock::NLTemplateBlock( const string & name ) : name( name ), enabled( true ), resized( false ) {
+Block::Block( const string & name ) : name( name ), enabled( true ), resized( false ) {
 }
 
 
-NLTemplateFragment *NLTemplateBlock::copy() const {
-    NLTemplateBlock *block = new NLTemplateBlock( name );
+Fragment *Block::copy() const {
+    Block *block = new Block( name );
     block->properties = properties;
     for ( size_t i=0; i < fragments.size(); i++ ) {
         block->fragments.push_back( fragments[ i ]->copy() );
@@ -266,76 +279,76 @@ NLTemplateFragment *NLTemplateBlock::copy() const {
 }
 
 
-NLTemplateBlock::~NLTemplateBlock() {
+Block::~Block() {
     for ( size_t i=0; i < nodes.size(); i++ ) {
         delete nodes[ i ];
     }
 }
 
 
-bool NLTemplateBlock::isBlockNamed( const string & name ) const {
+bool Block::isBlockNamed( const string & name ) const {
     return this->name == name;
 }
 
 
-void NLTemplateBlock::enable() {
+void Block::enable() {
     enabled = true;
 }
 
 
-void NLTemplateBlock::disable() {
+void Block::disable() {
     enabled = false;
 }
 
-void NLTemplateBlock::repeat( size_t n ) {
+void Block::repeat( size_t n ) {
     resized = true;
     for ( size_t i=0; i < nodes.size(); i++ ) {
         delete nodes[ i ];
     }
     nodes.clear();
     for ( size_t i=0; i < n; i++ ) {
-        nodes.push_back( static_cast<NLTemplateNode*>( copy() ) );
+        nodes.push_back( static_cast<Node*>( copy() ) );
     }
 }
 
 
-NLTemplateNode & NLTemplateBlock::operator[]( size_t index ) {
+Node & Block::operator[]( size_t index ) {
     return *nodes.at( index );
 }
 
 
-void NLTemplateBlock::render( NLTemplateOutput & output, const NLTemplateDictionary & ) const {
+void Block::render( Output & output, const Dictionary & ) const {
     if ( enabled ) {
         if ( resized ) {
             for ( size_t i=0; i < nodes.size(); i++ ) {
                 nodes[ i ]->render( output, *nodes[ i ] );
             }
         } else {
-            NLTemplateNode::render( output, *this );
+            Node::render( output, *this );
         }
     }
 }
 
 
-NLTemplateOutput::~NLTemplateOutput() {
+Output::~Output() {
 }
 
 
-void NLTemplateOutputString::print( const string & text ) {
+void OutputString::print( const string & text ) {
     buf << text;
 }
 
 
-void NLTemplateOutputStdout::print( const std::string &text ) {
+void OutputStdout::print( const std::string &text ) {
     cout << text;
 }
 
 
-NLTemplateLoader::~NLTemplateLoader() {
+Loader::~Loader() {
 }
 
 
-const char * NLTemplateLoaderFile::load( const char *name ) {
+const char * LoaderFile::load( const char *name ) {
     FILE *f = fopen( name, "rb" );
     fseek( f, 0, SEEK_END );
     long len = ftell( f );
@@ -348,23 +361,23 @@ const char * NLTemplateLoaderFile::load( const char *name ) {
 }
 
 
-NLTemplate::NLTemplate( NLTemplateLoader & loader ) : NLTemplateBlock( "main" ), loader( loader ) {
+Template::Template( Loader & loader ) : Block( "main" ), loader( loader ) {
 }
 
 
-void NLTemplate::load_recursive( const char *name, vector<NLTemplateTokenizer*> & files, vector<NLTemplateNode*> & nodes ) {
-    NLTemplateTokenizer *tokenizer = new NLTemplateTokenizer( loader.load( name ) );
+void Template::load_recursive( const char *name, vector<Tokenizer*> & files, vector<Node*> & nodes ) {
+    Tokenizer *tokenizer = new Tokenizer( loader.load( name ) );
     files.push_back( tokenizer );
     
     bool done = false;
     while( !done ) {
-        NLToken token = files.back()->next();
+        Token token = files.back()->next();
         switch ( token.type ) {
             case TOKEN_END:
                 done = true;
                 break;
             case TOKEN_BLOCK: {
-                NLTemplateBlock *block = new NLTemplateBlock( token.value );
+                Block *block = new Block( token.value );
                 nodes.back()->fragments.push_back( block );
                 nodes.push_back( block );
             }
@@ -373,10 +386,10 @@ void NLTemplate::load_recursive( const char *name, vector<NLTemplateTokenizer*> 
                 nodes.pop_back();
                 break;
             case TOKEN_VAR:
-                nodes.back()->fragments.push_back( new NLTemplateProperty( token.value ) );
+                nodes.back()->fragments.push_back( new Property( token.value ) );
                 break;
             case TOKEN_TEXT:
-                nodes.back()->fragments.push_back( new NLTemplateText( token.value ) );
+                nodes.back()->fragments.push_back( new Text( token.value ) );
                 break;
             case TOKEN_INCLUDE:
                 load_recursive( token.value.c_str(), files, nodes );
@@ -389,7 +402,7 @@ void NLTemplate::load_recursive( const char *name, vector<NLTemplateTokenizer*> 
 }
 
 
-void NLTemplate::clear() {
+void Template::clear() {
     for ( size_t i=0; i < fragments.size(); i++ ) {
         delete fragments[ i ];
     }
@@ -402,18 +415,19 @@ void NLTemplate::clear() {
 }
 
 
-void NLTemplate::load( const char *name ) {
+void Template::load( const char *name ) {
     clear();
     
-    vector<NLTemplateNode*> stack;
+    vector<Node*> stack;
     stack.push_back( this );
     
-    vector<NLTemplateTokenizer*> file_stack;
+    vector<Tokenizer*> file_stack;
     
     load_recursive( name, file_stack, stack );
 }
 
 
-void NLTemplate::render( NLTemplateOutput & output ) const {
-    NLTemplateNode::render( output, *this );
+void Template::render( Output & output ) const {
+    Node::render( output, *this );
 }
+

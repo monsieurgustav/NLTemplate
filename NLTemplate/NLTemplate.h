@@ -1,5 +1,5 @@
-#ifndef __NLTEMPLATE_H__
-#define __NLTEMPLATE_H__
+#ifndef __Template_H__
+#define __Template_H__
 
 
 #include <string>
@@ -8,39 +8,34 @@
 #include <iostream>
 
 
+namespace NL {
 
-enum {
-    TOKEN_END,
-    TOKEN_TEXT,
-    TOKEN_BLOCK,
-    TOKEN_ENDBLOCK,
-    TOKEN_INCLUDE,
-    TOKEN_VAR
-};
+namespace Template {
 
 
-struct NLToken {
+
+struct Token {
     int type;
     std::string value;
 };
 
 
-class NLTemplateTokenizer {
-protected:
+class Tokenizer {
+private:
     const char *text;
     long len;
     long pos;
-    NLToken peek;
+    Token peek;
     bool peeking;
 public:
-    // NLTemplateTokenizer will free() the text on exit
-    NLTemplateTokenizer( const char *text );
-    ~NLTemplateTokenizer();
-    NLToken next();
+    // Tokenizer will free() the text on exit
+    Tokenizer( const char *text );
+    ~Tokenizer();
+    Token next();
 };
 
 
-class NLTemplateDictionary {
+class Dictionary {
 public:
     std::vector<std::pair<std::string, std::string> > properties;
     
@@ -50,87 +45,87 @@ public:
 };
 
 
-class NLTemplateOutput {
+class Output {
 public:
-    virtual ~NLTemplateOutput();
+    virtual ~Output();
     virtual void print( const std::string & text ) = 0;
 };
 
 
-class NLTemplateFragment {
+class Fragment {
 public:
-    virtual void render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const = 0;
-    virtual ~NLTemplateFragment();
-    virtual NLTemplateFragment *copy() const = 0;
+    virtual void render( Output & output, const Dictionary & dictionary ) const = 0;
+    virtual ~Fragment();
+    virtual Fragment *copy() const = 0;
     virtual bool isBlockNamed( const std::string & name ) const;
 };
 
 
-class NLTemplateText : public NLTemplateFragment {
-protected:
+class Text : public Fragment {
+private:
     const std::string text;
     
 public:
-    NLTemplateText( const std::string & text );
-    void render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const;
-    NLTemplateFragment *copy() const;
+    Text( const std::string & text );
+    void render( Output & output, const Dictionary & dictionary ) const;
+    Fragment *copy() const;
 };
 
 
-class NLTemplateProperty : public NLTemplateFragment {
-protected:
+class Property : public Fragment {
+private:
     const std::string name;
     
 public:
-    NLTemplateProperty( const std::string & name );
-    void render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const;
-    NLTemplateFragment *copy() const;
+    Property( const std::string & name );
+    void render( Output & output, const Dictionary & dictionary ) const;
+    Fragment *copy() const;
 };
 
 
-class NLTemplateBlock;
+class Block;
 
 
-class NLTemplateNode : public NLTemplateFragment, public NLTemplateDictionary {
+class Node : public Fragment, public Dictionary {
 public:
-    std::vector<NLTemplateFragment*> fragments;
+    std::vector<Fragment*> fragments;
     
 public:
-    ~NLTemplateNode();
-    NLTemplateFragment *copy() const;
-    void render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const;
-    NLTemplateBlock & block( const std::string & name ) const;
+    ~Node();
+    Fragment *copy() const;
+    void render( Output & output, const Dictionary & dictionary ) const;
+    Block & block( const std::string & name ) const;
 };
 
 
-class NLTemplateBlock : public NLTemplateNode {
+class Block : public Node {
 protected:
     const std::string name;
     bool enabled;
     bool resized;
-    std::vector<NLTemplateNode*> nodes;
+    std::vector<Node*> nodes;
     
 public:
-    NLTemplateBlock( const std::string & name );
-    NLTemplateFragment *copy() const;
-    ~NLTemplateBlock();
+    Block( const std::string & name );
+    Fragment *copy() const;
+    ~Block();
     bool isBlockNamed( const std::string & name ) const;
     void enable();
     void disable();
     void repeat( size_t n );
-    NLTemplateNode & operator[]( size_t index );
-    void render( NLTemplateOutput & output, const NLTemplateDictionary & dictionary ) const;
+    Node & operator[]( size_t index );
+    void render( Output & output, const Dictionary & dictionary ) const;
 };
 
 
 
-class NLTemplateOutputStdout : public NLTemplateOutput {
+class OutputStdout : public Output {
 public:
     void print( const std::string & text );
 };
 
 
-class NLTemplateOutputString : public NLTemplateOutput {
+class OutputString : public Output {
 public:
     std::stringstream buf;
     
@@ -139,34 +134,39 @@ public:
 };
 
 
-class NLTemplateLoader {
+class Loader {
 public:
-    virtual ~NLTemplateLoader();
+    virtual ~Loader();
     // Returns mallocated memory that the consumer must free()
     virtual const char * load( const char *name ) = 0;
 };
 
 
-class NLTemplateLoaderFile : public NLTemplateLoader {
+class LoaderFile : public Loader {
 public:
     const char * load( const char *name );
 };
 
 
 
-class NLTemplate : public NLTemplateBlock {
+class Template : public Block {
 protected:
-    NLTemplateLoader & loader;
+    Loader & loader;
     
 public:
-    NLTemplate( NLTemplateLoader & loader );
+    Template( Loader & loader );
     void clear();
     void load( const char *name );
-    void render( NLTemplateOutput & output ) const;
+    void render( Output & output ) const;
     
 protected:
-    void load_recursive( const char *name, std::vector<NLTemplateTokenizer*> & files, std::vector<NLTemplateNode*> & nodes );
+    void load_recursive( const char *name, std::vector<Tokenizer*> & files, std::vector<Node*> & nodes );
 };
 
+
+    
+} // namespace Template
+    
+} // namespace NL
 
 #endif

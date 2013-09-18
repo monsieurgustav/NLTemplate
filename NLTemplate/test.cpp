@@ -1,7 +1,10 @@
 #include <iostream>
 #include "NLTemplate.h"
 
+
 using namespace std;
+using namespace NL::Template;
+
 
 
 int main(int, char *[] ) {
@@ -9,10 +12,10 @@ int main(int, char *[] ) {
     const char *details[ 3 ] = { "Red", "Green", "Blue" };
 
     // Let's use the default loader that loads files from disk.
-    NLTemplateLoaderFile loader;
+    LoaderFile loader;
     
     // Initialize and load the main template. This will parse it and load any files that are included by it using the {% include ... %} tags.
-    NLTemplate t( loader );
+    Template t( loader );
     t.load( "test.txt" );
     
     // Set a top-level variable
@@ -28,7 +31,7 @@ int main(int, char *[] ) {
         t.block( "items" )[ i ].set( "text", "Lorem Ipsum" );
         
         // We can get a shortcut reference to a nested block
-        NLTemplateBlock & block = t.block( "items" )[ i ].block( "detailblock" );
+        Block & block = t.block( "items" )[ i ].block( "detailblock" );
         block.set( "detail", details[ i ] );
         
         // Disable this block for the first item in the list. Can be useful for opening/closing HTML tables etc.
@@ -38,11 +41,13 @@ int main(int, char *[] ) {
     }
     
     // Render the template with the variables we've set above, send it directly to stdout
-    NLTemplateOutputStdout output;
+    OutputStdout output;
     t.render( output );
 
     // Another output method can place the output into a string
-    NLTemplateOutputString buffer;
+    OutputString buffer;
     t.render( buffer );
     cout << buffer.buf.str() << endl;
+    
+    return 0;
 }
