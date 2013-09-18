@@ -172,9 +172,9 @@ a:
 
 
 const string Dictionary::find( const string & name ) const {
-    for ( size_t i=0; i < properties.size(); i++ ) {
-        if ( properties[ i ].first == name ) {
-            return properties[ i ].second;
+    for ( auto const & property : properties ) {
+        if ( property.first == name ) {
+            return property.second;
         }
     }
     return "";
@@ -182,9 +182,9 @@ const string Dictionary::find( const string & name ) const {
 
 
 void Dictionary::set( const string & name, const string & value ) {
-    for ( size_t i=0; i < properties.size(); i++ ) {
-        if ( properties[ i ].first == name ) {
-            properties[ i ].second = value;
+    for ( auto & property : properties ) {
+        if ( property.first == name ) {
+            property.second = value;
             return;
         }
     }
@@ -231,8 +231,8 @@ Fragment *Property::copy() const {
 
 
 Node::~Node() {
-    for ( size_t i=0; i < fragments.size(); i++ ) {
-        delete fragments[ i ];
+    for ( auto fragment : fragments ) {
+        delete fragment;
     }
 }
 
@@ -240,25 +240,25 @@ Node::~Node() {
 Fragment *Node::copy() const {
     Node *node = new Node();
     node->properties = properties;
-    for ( size_t i=0; i < fragments.size(); i++ ) {
-        node->fragments.push_back( fragments[ i ]->copy() );
+    for ( auto const & fragment : fragments ) {
+        node->fragments.push_back( fragment->copy() );
     }
     return node;
 }
 
 
 void Node::render( Output & output, const Dictionary & ) const {
-    for ( size_t i=0; i < fragments.size(); i++ ) {
-        fragments[ i ]->render( output, *this );
+    for ( auto const & fragment : fragments ) {
+        fragment->render( output, *this );
     }
 }
 
 
 
 Block & Node::block( const string & name ) const {
-    for ( size_t i=0; i < fragments.size(); i++ ) {
-        if ( fragments[ i ]->isBlockNamed( name ) ) {
-            return *dynamic_cast<Block*>( fragments[ i ] );
+    for ( auto & fragment : fragments ) {
+        if ( fragment->isBlockNamed( name ) ) {
+            return *dynamic_cast<Block*>( fragment );
         }
     }
     throw 0;
@@ -272,16 +272,16 @@ Block::Block( const string & name ) : name( name ), enabled( true ), resized( fa
 Fragment *Block::copy() const {
     Block *block = new Block( name );
     block->properties = properties;
-    for ( size_t i=0; i < fragments.size(); i++ ) {
-        block->fragments.push_back( fragments[ i ]->copy() );
+    for ( auto const & fragment : fragments ) {
+        block->fragments.push_back( fragment->copy() );
     }
     return block;
 }
 
 
 Block::~Block() {
-    for ( size_t i=0; i < nodes.size(); i++ ) {
-        delete nodes[ i ];
+    for ( auto node : nodes ) {
+        delete node;
     }
 }
 
@@ -302,8 +302,8 @@ void Block::disable() {
 
 void Block::repeat( size_t n ) {
     resized = true;
-    for ( size_t i=0; i < nodes.size(); i++ ) {
-        delete nodes[ i ];
+    for ( auto node : nodes ) {
+        delete node;
     }
     nodes.clear();
     for ( size_t i=0; i < n; i++ ) {
@@ -320,8 +320,8 @@ Node & Block::operator[]( size_t index ) {
 void Block::render( Output & output, const Dictionary & ) const {
     if ( enabled ) {
         if ( resized ) {
-            for ( size_t i=0; i < nodes.size(); i++ ) {
-                nodes[ i ]->render( output, *nodes[ i ] );
+            for ( auto node : nodes ) {
+                node->render( output, *node );
             }
         } else {
             Node::render( output, *this );
@@ -366,8 +366,7 @@ Template::Template( Loader & loader ) : Block( "main" ), loader( loader ) {
 
 
 void Template::load_recursive( const char *name, vector<Tokenizer*> & files, vector<Node*> & nodes ) {
-    Tokenizer *tokenizer = new Tokenizer( loader.load( name ) );
-    files.push_back( tokenizer );
+    files.push_back( new Tokenizer( loader.load( name ) ) );
     
     bool done = false;
     while( !done ) {
@@ -403,11 +402,11 @@ void Template::load_recursive( const char *name, vector<Tokenizer*> & files, vec
 
 
 void Template::clear() {
-    for ( size_t i=0; i < fragments.size(); i++ ) {
-        delete fragments[ i ];
+    for ( auto fragment : fragments ) {
+        delete fragment;
     }
-    for ( size_t i=0; i < nodes.size(); i++ ) {
-        delete nodes[ i ];
+    for ( auto node : nodes ) {
+        delete node;
     }
     nodes.clear();
     fragments.clear();

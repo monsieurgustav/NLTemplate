@@ -13,6 +13,10 @@ into a string.
 - File includes
 - No external dependencies
 
+###Requirements###
+
+- C++11 (please use the C++98 branch if you need support for legacy compilers)
+
 ###Installation###
 
 To start using NLTemplate, add NLTemplate.cpp to your project and make sure NLTemplate.h is in your header search path.
