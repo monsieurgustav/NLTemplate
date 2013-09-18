@@ -104,7 +104,7 @@ static inline long match_tag_with_param( const char *tag, const char *text, stri
 }
 
 
-Tokenizer::Tokenizer( const std::shared_ptr<char> & text ) :
+Tokenizer::Tokenizer( const shared_ptr<char> & text ) :
 text_ptr( text ),
 text( text.get() ),
 len( strlen( text.get() ) ),
@@ -361,12 +361,12 @@ Template::Template( Loader & loader ) : Block( "main" ), loader( loader ) {
 }
 
 
-void Template::load_recursive( const string & name, vector<Tokenizer*> & files, vector<Node*> & nodes ) {
-    files.push_back( new Tokenizer( loader.load( name ) ) );
+void Template::load_recursive( const string & name, vector<Tokenizer> & files, vector<Node*> & nodes ) {
+    files.emplace_back( loader.load( name ) );
     
     bool done = false;
     while( !done ) {
-        Token token = files.back()->next();
+        Token token = files.back().next();
         switch ( token.type ) {
             case TOKEN_END:
                 done = true;
@@ -392,7 +392,6 @@ void Template::load_recursive( const string & name, vector<Tokenizer*> & files, 
         }
     }
     
-    delete files.back();
     files.pop_back();
 }
 
@@ -416,7 +415,7 @@ void Template::load( const string & name ) {
     vector<Node*> stack;
     stack.push_back( this );
     
-    vector<Tokenizer*> file_stack;
+    vector<Tokenizer> file_stack;
     
     load_recursive( name, file_stack, stack );
 }

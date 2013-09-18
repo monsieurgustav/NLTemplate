@@ -161,7 +161,7 @@ public:
 private:
     Loader & loader;
 
-    void load_recursive( const std::string & name, std::vector<Tokenizer*> & files, std::vector<Node*> & nodes );
+    void load_recursive( const std::string & name, std::vector<Tokenizer> & files, std::vector<Node*> & nodes );
 };
 
 
