@@ -138,13 +138,13 @@ class Loader {
 public:
     virtual ~Loader();
     // Returns mallocated memory that the consumer must free()
-    virtual const char * load( const char *name ) = 0;
+    virtual const char * load( const std::string & name ) = 0;
 };
 
 
 class LoaderFile : public Loader {
 public:
-    const char * load( const char *name );
+    const char * load( const std::string & name );
 };
 
 
@@ -156,15 +156,15 @@ protected:
 public:
     Template( Loader & loader );
     void clear();
-    void load( const char *name );
+    void load( const std::string & name );
     void render( Output & output ) const;
     
 protected:
-    void load_recursive( const char *name, std::vector<Tokenizer*> & files, std::vector<Node*> & nodes );
+    void load_recursive( const std::string & name, std::vector<Tokenizer*> & files, std::vector<Node*> & nodes );
 };
 
 
-    
+
 } // namespace Template
     
 } // namespace NL

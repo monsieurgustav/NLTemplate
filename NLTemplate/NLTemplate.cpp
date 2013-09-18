@@ -348,8 +348,8 @@ Loader::~Loader() {
 }
 
 
-const char * LoaderFile::load( const char *name ) {
-    FILE *f = fopen( name, "rb" );
+const char * LoaderFile::load( const string & name ) {
+    FILE *f = fopen( name.c_str(), "rb" );
     fseek( f, 0, SEEK_END );
     long len = ftell( f );
     fseek( f, 0, SEEK_SET );
@@ -365,7 +365,7 @@ Template::Template( Loader & loader ) : Block( "main" ), loader( loader ) {
 }
 
 
-void Template::load_recursive( const char *name, vector<Tokenizer*> & files, vector<Node*> & nodes ) {
+void Template::load_recursive( const string & name, vector<Tokenizer*> & files, vector<Node*> & nodes ) {
     files.push_back( new Tokenizer( loader.load( name ) ) );
     
     bool done = false;
@@ -414,7 +414,7 @@ void Template::clear() {
 }
 
 
-void Template::load( const char *name ) {
+void Template::load( const string & name ) {
     clear();
     
     vector<Node*> stack;
