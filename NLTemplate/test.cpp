@@ -49,5 +49,9 @@ int main(int, char *[] ) {
     t.render( buffer );
     cout << buffer.buf.str() << endl;
     
+    // In case we want to reuse the outputs, we need to reset them.
+    output.reset();
+    buffer.reset();
+    
     return 0;
 }

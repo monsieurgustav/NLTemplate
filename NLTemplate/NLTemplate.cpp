@@ -330,8 +330,18 @@ Output::~Output() {
 }
 
 
+void OutputString::reset() {
+    buf.str("");
+    buf.clear();
+}
+
+
 void OutputString::print( const string & text ) {
     buf << text;
+}
+
+
+void OutputStdout::reset() {
 }
 
 

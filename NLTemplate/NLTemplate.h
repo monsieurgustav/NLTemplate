@@ -49,6 +49,7 @@ protected:
 class Output {
 public:
     virtual ~Output();
+    virtual void reset() = 0;
     virtual void print( const std::string & text ) = 0;
 };
 
@@ -93,7 +94,7 @@ public:
     Fragment *copy() const;
     void render( Output & output, const Dictionary & dictionary ) const;
     Block & block( const std::string & name ) const;
-
+    
 protected:
     std::vector<Fragment*> fragments;
     
@@ -112,7 +113,7 @@ public:
     void repeat( size_t n );
     Node & operator[]( size_t index );
     void render( Output & output, const Dictionary & dictionary ) const;
-
+    
 protected:
     const std::string name;
     bool enabled;
@@ -124,6 +125,7 @@ protected:
 
 class OutputStdout : public Output {
 public:
+    void reset();
     void print( const std::string & text );
 };
 
@@ -133,6 +135,7 @@ public:
     std::stringstream buf;
     
 public:
+    void reset();
     void print( const std::string & text );
 };
 
