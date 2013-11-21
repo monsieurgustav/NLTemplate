@@ -113,7 +113,7 @@ You can use XML, JSON or plain text as well for your templates.
 
 ###Personal note###
 
-If you use NLTemplate in a project, I'd love to hear about it. Please do let me know at tomovo@gmail.com. Thanks!
+If you use NLTemplate in a project, I'd love to hear about it. Please do let me know at tom@catnapgames.com. Thanks!
 
 ### See also ###
 
