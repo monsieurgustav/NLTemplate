@@ -74,14 +74,8 @@ int main(int, char *[] ) {
         }
     }
     
-    // Render the template with the variables we've set above, send it directly to stdout
-    NLTemplateOutputStdout output;
-    t.render( output );
-
-    // Another output method can place the output into a string
-    //NLTemplateOutputString output;
-    //t.render( output );
-    //cout << output.buf.str() << endl;
+    // Render the template with the variables we've set above
+    t.render( cout );
 }
 ```
 
