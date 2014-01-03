@@ -35,7 +35,7 @@ gcc -Wall -pedantic -o demo -lstdc++ *.cpp
 ###Example###
 
 ``` c++
-#include \<iostream\>
+#include <iostream>
 #include "NLTemplate.h"
 
 
