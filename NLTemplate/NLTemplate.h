@@ -46,17 +46,10 @@ protected:
 };
 
 
-class Output {
-public:
-    virtual ~Output();
-    virtual void reset() = 0;
-    virtual void print( const std::string & text ) = 0;
-};
-
 
 class Fragment {
 public:
-    virtual void render( Output & output, const Dictionary & dictionary ) const = 0;
+    virtual void render( std::ostream & output, const Dictionary & dictionary ) const = 0;
     virtual ~Fragment();
     virtual Fragment *copy() const = 0;
     virtual bool isBlockNamed( const std::string & name ) const;
@@ -66,7 +59,7 @@ public:
 class Text : public Fragment {
 public:
     Text( const std::string & text );
-    void render( Output & output, const Dictionary & dictionary ) const;
+    void render( std::ostream & output, const Dictionary & dictionary ) const;
     Fragment *copy() const;
     
 private:
@@ -77,7 +70,7 @@ private:
 class Property : public Fragment {
 public:
     Property( const std::string & name );
-    void render( Output & output, const Dictionary & dictionary ) const;
+    void render( std::ostream & output, const Dictionary & dictionary ) const;
     Fragment *copy() const;
     
 private:
@@ -92,7 +85,7 @@ class Node : public Fragment, public Dictionary {
 public:
     ~Node();
     Fragment *copy() const;
-    void render( Output & output, const Dictionary & dictionary ) const;
+    void render( std::ostream & output, const Dictionary & dictionary ) const;
     Block & block( const std::string & name ) const;
     
 protected:
@@ -112,7 +105,7 @@ public:
     void disable();
     void repeat( size_t n );
     Node & operator[]( size_t index );
-    void render( Output & output, const Dictionary & dictionary ) const;
+    void render( std::ostream & output, const Dictionary & dictionary ) const;
     
 protected:
     const std::string name;
@@ -122,22 +115,6 @@ protected:
 };
 
 
-
-class OutputStdout : public Output {
-public:
-    void reset();
-    void print( const std::string & text );
-};
-
-
-class OutputString : public Output {
-public:
-    std::stringstream buf;
-    
-public:
-    void reset();
-    void print( const std::string & text );
-};
 
 
 class Loader {
@@ -159,7 +136,7 @@ public:
     Template( Loader & loader );
     void clear();
     void load( const std::string & name );
-    void render( Output & output ) const;
+    void render( std::ostream & output ) const;
     
 private:
     Loader & loader;

@@ -40,18 +40,13 @@ int main(int, char *[] ) {
         }
     }
     
-    // Render the template with the variables we've set above, send it directly to stdout
-    OutputStdout output;
-    t.render( output );
+    // Render the template with the variables we've set above, print to screen
+    t.render( cout );
 
     // Another output method can place the output into a string
-    OutputString buffer;
+    stringstream buffer;
     t.render( buffer );
-    cout << buffer.buf.str() << endl;
-    
-    // In case we want to reuse the outputs, we need to reset them.
-    output.reset();
-    buffer.reset();
+    cout << buffer.str() << endl;
     
     return 0;
 }

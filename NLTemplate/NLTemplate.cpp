@@ -202,8 +202,8 @@ Text::Text( const string & text ) : text( text ) {
 }
 
 
-void Text::render( Output & output, const Dictionary & ) const {
-    output.print( text );
+void Text::render( std::ostream & output, const Dictionary & ) const {
+    output << text;
 }
 
 
@@ -216,8 +216,8 @@ Property::Property( const string & name ) : name( name ) {
 }
 
 
-void Property::render( Output & output, const Dictionary & dictionary ) const {
-    output.print( dictionary.find( name ) );
+void Property::render( std::ostream & output, const Dictionary & dictionary ) const {
+    output << dictionary.find( name );
 }
 
 
@@ -243,7 +243,7 @@ Fragment *Node::copy() const {
 }
 
 
-void Node::render( Output & output, const Dictionary & ) const {
+void Node::render( std::ostream & output, const Dictionary & ) const {
     for ( auto const & fragment : fragments ) {
         fragment->render( output, *this );
     }
@@ -313,7 +313,7 @@ Node & Block::operator[]( size_t index ) {
 }
 
 
-void Block::render( Output & output, const Dictionary & ) const {
+void Block::render( std::ostream & output, const Dictionary & ) const {
     if ( enabled ) {
         if ( resized ) {
             for ( auto node : nodes ) {
@@ -323,30 +323,6 @@ void Block::render( Output & output, const Dictionary & ) const {
             Node::render( output, *this );
         }
     }
-}
-
-
-Output::~Output() {
-}
-
-
-void OutputString::reset() {
-    buf.str("");
-    buf.clear();
-}
-
-
-void OutputString::print( const string & text ) {
-    buf << text;
-}
-
-
-void OutputStdout::reset() {
-}
-
-
-void OutputStdout::print( const std::string &text ) {
-    cout << text;
 }
 
 
@@ -431,7 +407,7 @@ void Template::load( const string & name ) {
 }
 
 
-void Template::render( Output & output ) const {
+void Template::render( std::ostream & output ) const {
     Node::render( output, *this );
 }
 
