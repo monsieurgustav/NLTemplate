@@ -110,6 +110,11 @@ int main(int, char *[] ) {
 Despite the headline, there is nothing HTML-specific in NLTemplate.
 You can use XML, JSON or plain text as well for your templates.
 
+
+###Personal note###
+
+If you use NLTemplate in a project, I'd love to hear about it. Please do let me know at tom@catnapgames.com. Thanks!
+
 ### See also ###
 
 Goes well with [NLDatabase](https://github.com/catnapgames/NLDatabase) - a lightweight SQLite wrapper for C++.
