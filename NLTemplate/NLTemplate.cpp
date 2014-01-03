@@ -202,7 +202,7 @@ Text::Text( const string & text ) : text( text ) {
 }
 
 
-void Text::render( std::ostream & output, const Dictionary & ) const {
+void Text::render( ostream & output, const Dictionary & ) const {
     output << text;
 }
 
@@ -216,7 +216,7 @@ Property::Property( const string & name ) : name( name ) {
 }
 
 
-void Property::render( std::ostream & output, const Dictionary & dictionary ) const {
+void Property::render( ostream & output, const Dictionary & dictionary ) const {
     output << dictionary.find( name );
 }
 
@@ -243,7 +243,7 @@ Fragment *Node::copy() const {
 }
 
 
-void Node::render( std::ostream & output, const Dictionary & ) const {
+void Node::render( ostream & output, const Dictionary & ) const {
     for ( auto const & fragment : fragments ) {
         fragment->render( output, *this );
     }
@@ -313,7 +313,7 @@ Node & Block::operator[]( size_t index ) {
 }
 
 
-void Block::render( std::ostream & output, const Dictionary & ) const {
+void Block::render( ostream & output, const Dictionary & ) const {
     if ( enabled ) {
         if ( resized ) {
             for ( auto node : nodes ) {
@@ -330,7 +330,7 @@ Loader::~Loader() {
 }
 
 
-std::shared_ptr<char>  LoaderFile::load( const string & name ) {
+shared_ptr<char>  LoaderFile::load( const string & name ) {
     FILE *f = fopen( name.c_str(), "rb" );
     fseek( f, 0, SEEK_END );
     long len = ftell( f );
@@ -407,7 +407,7 @@ void Template::load( const string & name ) {
 }
 
 
-void Template::render( std::ostream & output ) const {
+void Template::render( ostream & output ) const {
     Node::render( output, *this );
 }
 

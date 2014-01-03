@@ -43,6 +43,9 @@ int main(int, char *[] ) {
     // Render the template with the variables we've set above, print to screen
     t.render( cout );
 
+    
+    cout << "--------------------------------------------------------------------------------" << endl;
+    
     // Another output method can place the output into a string
     stringstream buffer;
     t.render( buffer );
