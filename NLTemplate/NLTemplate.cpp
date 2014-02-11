@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace NL::Template;
+using namespace NL::Template::Private;
 
 
 

@@ -13,7 +13,8 @@ namespace NL {
 
 namespace Template {
 
-
+namespace Private {
+    
 
 struct Token {
     int type;
@@ -46,7 +47,6 @@ protected:
 };
 
 
-
 class Fragment {
 public:
     virtual void render( std::ostream & output, const Dictionary & dictionary ) const = 0;
@@ -77,15 +77,21 @@ private:
     const std::string name;
 };
 
+    
+}; // namespace Private
 
+    
+    
 class Block;
 
+//using namespace Private;
 
-class Node : public Fragment, public Dictionary {
+    
+class Node : public Private::Fragment, public Private::Dictionary {
 public:
     ~Node();
     Fragment *copy() const;
-    void render( std::ostream & output, const Dictionary & dictionary ) const;
+    void render( std::ostream & output, const Private::Dictionary & dictionary ) const;
     Block & block( const std::string & name ) const;
     
 protected:
@@ -115,8 +121,6 @@ protected:
 };
 
 
-
-
 class Loader {
 public:
     virtual ~Loader();
@@ -141,7 +145,7 @@ public:
 private:
     Loader & loader;
 
-    void load_recursive( const std::string & name, std::vector<Tokenizer> & files, std::vector<Node*> & nodes );
+    void load_recursive( const std::string & name, std::vector<Private::Tokenizer> & files, std::vector<Node*> & nodes );
 };
 
 
