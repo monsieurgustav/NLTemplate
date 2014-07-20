@@ -27,6 +27,7 @@ static inline bool alphanum( const char c ) {
     ( c >= 'A' && c <= 'Z' ) ||
     ( c >= '0' && c <= '9' ) ||
     ( c == '_' ) ||
+    ( c == '/' ) ||
     ( c == '.' );
 }
 
