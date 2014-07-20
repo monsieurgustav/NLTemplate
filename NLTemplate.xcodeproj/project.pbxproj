@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		F827ACF41711FE10004A2390 /* NLTemplate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F827ACF11711FE10004A2390 /* NLTemplate.cpp */; };
 		F827ACF51711FE10004A2390 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F827ACF31711FE10004A2390 /* test.cpp */; };
-		F827ACF91711FE8E004A2390 /* test.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = F827ACF71711FE82004A2390 /* test.txt */; };
-		F827ACFA1711FE90004A2390 /* testheader.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = F827ACF81711FE82004A2390 /* testheader.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -20,8 +18,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				F827ACF91711FE8E004A2390 /* test.txt in CopyFiles */,
-				F827ACFA1711FE90004A2390 /* testheader.txt in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,8 +28,8 @@
 		F827ACF11711FE10004A2390 /* NLTemplate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NLTemplate.cpp; sourceTree = "<group>"; };
 		F827ACF21711FE10004A2390 /* NLTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NLTemplate.h; sourceTree = "<group>"; };
 		F827ACF31711FE10004A2390 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
-		F827ACF71711FE82004A2390 /* test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
-		F827ACF81711FE82004A2390 /* testheader.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = testheader.txt; sourceTree = "<group>"; };
+		F886A19D197BDC8A00B02C2E /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
+		F886A19E197BDC8A00B02C2E /* testheader.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = testheader.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +46,7 @@
 		F827ACDC1711FDC1004A2390 = {
 			isa = PBXGroup;
 			children = (
-				F827ACF61711FE76004A2390 /* Test Files */,
+				F886A19C197BDC8A00B02C2E /* Templates */,
 				F827ACE71711FDC1004A2390 /* NLTemplate */,
 				F827ACE61711FDC1004A2390 /* Products */,
 			);
@@ -74,13 +70,13 @@
 			path = NLTemplate;
 			sourceTree = "<group>";
 		};
-		F827ACF61711FE76004A2390 /* Test Files */ = {
+		F886A19C197BDC8A00B02C2E /* Templates */ = {
 			isa = PBXGroup;
 			children = (
-				F827ACF71711FE82004A2390 /* test.txt */,
-				F827ACF81711FE82004A2390 /* testheader.txt */,
+				F886A19D197BDC8A00B02C2E /* test.txt */,
+				F886A19E197BDC8A00B02C2E /* testheader.txt */,
 			);
-			name = "Test Files";
+			path = Templates;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

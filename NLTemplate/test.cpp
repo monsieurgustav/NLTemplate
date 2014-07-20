@@ -15,7 +15,7 @@ int main(int, char *[] ) {
     
     Template t( loader );
     
-    t.load( "test.txt" );               // Load & parse the main template and its dependencies.
+    t.load( "Templates/test.txt" );               // Load & parse the main template and its dependencies.
     t.set( "text", "Hello, world" );    // Set a top-level variable
     t.block( "items" ).repeat( 3 );     // We need to know in advance that the "items" block will repeat 3 times.
     
