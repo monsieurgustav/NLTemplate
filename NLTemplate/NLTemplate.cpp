@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
 
 #include "NLTemplate.h"
 
@@ -106,10 +107,9 @@ static inline long match_tag_with_param( const char *tag, const char *text, stri
 }
 
 
-Tokenizer::Tokenizer( const shared_ptr<char> & text ) :
-text_ptr( text ),
-text( text.get() ),
-len( text ? strlen( text.get() ) : 0 ),
+Tokenizer::Tokenizer( const string & text ) :
+text_ptr( text.c_str() ),
+len( text.length() ),
 pos( 0 ),
 peeking( false )
 {
@@ -138,17 +138,17 @@ Token Tokenizer::next() {
     
 a:
     if ( pos < len ) {
-        long m = match_tag_with_param( s_block, text + pos, peek.value );
+        long m = match_tag_with_param( s_block, text_ptr + pos, peek.value );
         if ( m > 0 ) {
             peek.type = TOKEN_BLOCK;
             pos += m;
-        } else if ( !strncmp( s_endblock, text + pos, s_endblock_len ) ) {
+        } else if ( !strncmp( s_endblock, text_ptr + pos, s_endblock_len ) ) {
             peek.type = TOKEN_ENDBLOCK;
             pos += s_endblock_len;
-        } else if ( ( m = match_tag_with_param( s_include, text + pos, peek.value ) ) > 0 ) {
+        } else if ( ( m = match_tag_with_param( s_include, text_ptr + pos, peek.value ) ) > 0 ) {
             peek.type = TOKEN_INCLUDE;
             pos += m;
-        } else if ( ( m = match_var( text + pos, peek.value ) ) > 0 ) {
+        } else if ( ( m = match_var( text_ptr + pos, peek.value ) ) > 0 ) {
             peek.type = TOKEN_VAR;
             pos += m;
         } else {
@@ -161,7 +161,7 @@ a:
 
     if ( peeking ) {
         token.type = TOKEN_TEXT;
-        token.value = string( text + textpos, textlen );
+        token.value = string( text_ptr + textpos, textlen );
         return token;
     }
 
@@ -332,16 +332,18 @@ Loader::~Loader() {
 }
 
 
-shared_ptr<char>  LoaderFile::load( const string & name ) {
-    FILE *f = fopen( name.c_str(), "rb" );
-    fseek( f, 0, SEEK_END );
-    long len = ftell( f );
-    fseek( f, 0, SEEK_SET );
-    char *buffer = (char*) malloc( len + 1 );
-    fread( (void*) buffer, len, 1, f );
-    fclose( f );
-    buffer[ len ] = 0;
-    return shared_ptr<char>( buffer, free );
+Loader::Result LoaderFile::load( const string & name ) {
+    ifstream input;
+    input.open( name );
+    
+    if ( ! input.is_open() ) {
+        return { false, nullptr, "Could not open file " + name };
+    }
+    
+    std::string content( (std::istreambuf_iterator<char>( input ) ),
+                         (std::istreambuf_iterator<char>() ) );
+
+    return { true, content };
 }
 
 
@@ -350,7 +352,12 @@ Template::Template( Loader & loader ) : Block( "main" ), loader( loader ) {
 
 
 void Template::load_recursive( const string & name, vector<Tokenizer> & files, vector<Node*> & nodes ) {
-    files.emplace_back( loader.load( name ) );
+    auto loaded = loader.load( name );
+    if ( !loaded.valid ) {
+        // TODO pass loaded.error somewhere..
+        return;
+    }
+    files.emplace_back( loaded.data );
     
     bool done = false;
     while( !done ) {

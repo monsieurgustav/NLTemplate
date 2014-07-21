@@ -24,12 +24,11 @@ struct Token {
 
 class Tokenizer {
 public:
-    Tokenizer( const std::shared_ptr<char> & text ); // Tokenizer will free() the text on exit
+    Tokenizer( const std::string & text );
     Token next();
     
 private:
-    std::shared_ptr<char> text_ptr;
-    const char *text;
+    const char *text_ptr;
     long len;
     long pos;
     Token peek;
@@ -123,14 +122,20 @@ protected:
 
 class Loader {
 public:
+    struct Result {
+        bool valid;
+        std::string data;
+        std::string error;
+    };
+    
     virtual ~Loader();
-    virtual std::shared_ptr<char> load( const std::string & name ) = 0;
+    virtual Result load( const std::string & name ) = 0;
 };
 
 
 class LoaderFile : public Loader {
 public:
-    std::shared_ptr<char> load( const std::string & name );
+    Result load( const std::string & name );
 };
 
 
