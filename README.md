@@ -1,27 +1,27 @@
-##NLTemplate - simple HTML template library for C++##
+# NLTemplate - simple HTML template library for C++
 
-Use tags like **{{ variable }}** or **{% include header.html %}** or
-**{% block items %}{{ item }}{% endblock %}** in your template files.
+Use tags like `{{ variable }}` or `{% include header.html %} or
+`{% block items %}{{ item }}{% endblock %}` in your template files.
 Load the templates with NLTemplate, fill in the variables and setup the
 repeating blocks with C++ code and render the result to stdout or
 into a string.
 
-###Features###
+## Features
 
 - Variable replacement
 - Repeatable or optional blocks
 - File includes
 - No external dependencies
 
-###Requirements###
+## Requirements
 
 - C++11 (please use the C++98 branch if you need support for legacy compilers)
 
-###Installation###
+## Installation
 
 To start using NLTemplate, add NLTemplate.cpp to your project and make sure NLTemplate.h is in your header search path.
 
-###Demo###
+## Demo
 
 If you use Xcode, just open and run the demo project. On the command line, you could run the demo like this:
 
@@ -32,7 +32,7 @@ gcc -Wall -pedantic -o demo -lstdc++ *.cpp
 ./demo
 ```
 
-###Example###
+## Example
 
 ``` c++
 #include <iostream>
@@ -78,7 +78,7 @@ int main(int, char *[] ) {
 }
 ```
 
-###Example - test.txt###
+## Example - test.txt
 
 ``` html
 {% include header.txt %}
@@ -91,23 +91,23 @@ int main(int, char *[] ) {
 </p>{% endblock %}
 ```
 
-###Example - header.txt###
+## Example - header.txt
 
 ``` html
 <html><body>
 <h1>{{ text }}</h1>
 ```
 
-###Note about HTML###
+## Note about HTML
 
 Despite the headline, there is nothing HTML-specific in NLTemplate.
 You can use XML, JSON or plain text as well for your templates.
 
 
-###Personal note###
+## Personal note
 
 If you use NLTemplate in a project, I'd love to hear about it. Please do let me know at tom@catnapgames.com. Thanks!
 
-### See also ###
+## See also
 
 Goes well with [NLDatabase](https://github.com/catnapgames/NLDatabase) - a lightweight SQLite wrapper for C++.
