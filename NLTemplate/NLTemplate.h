@@ -139,14 +139,25 @@ public:
 };
 
 
+class LoaderMemory : public Loader {
+private:
+    std::vector<std::pair<std::string, std::string> > files;
+public:
+    void add( const std::string & name, const std::string & body );
+    Result load( const std::string & name );
+};
+
+
 
 class Template : public Block {
 public:
+    using Block::render;
+
     Template( Loader & loader );
     void clear();
     void load( const std::string & name );
-    void render( std::ostream & output ) const;
-    
+    virtual void render( std::ostream & output ) const;
+
 private:
     Loader & loader;
 

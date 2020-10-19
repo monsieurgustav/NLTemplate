@@ -7,7 +7,7 @@ using namespace NL::Template;
 
 
 
-int main(int, char *[] ) {
+static void testFile() {
     const char *titles[ 3 ] = { "Chico", "Harpo", "Groucho" };
     const char *details[ 3 ] = { "Red", "Green", "Blue" };
 
@@ -36,6 +36,28 @@ int main(int, char *[] ) {
     }
     
     t.render( cout ); // Render the template with the variables we've set above
+}
+
+
+static void testMemory() {
+    NL::Template::LoaderMemory loader;
     
+    NL::Template::Template t( loader );
+    
+    loader.add( "base", "<html><head>{{ title }}</head>\n<body><p>{% include text %}</p></body></html>\n" );
+    loader.add( "text", "Hi there, {{ name }}. How are you??" );
+    
+    t.load( "base" );
+    t.set( "title", "Testing memory loader" );
+    t.set( "name", "Stranger" );
+    
+    t.render( std::cout );
+}
+
+
+int main(int, char *[] ) {
+    testFile();
+    testMemory();
+   
     return 0;
 }

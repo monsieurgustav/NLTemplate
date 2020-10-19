@@ -347,6 +347,22 @@ Loader::Result LoaderFile::load( const string & name ) {
 }
 
 
+void LoaderMemory::add( const std::string & name, const std::string & body ) {
+    files.push_back( { name, body } );
+}
+
+
+Loader::Result LoaderMemory::load( const std::string & name ) {
+    for ( auto & pair : files ) {
+        if ( pair.first == name ) {
+            return { true, pair.second, "" };
+        }
+    }
+
+    return { false, nullptr, name + " not found." };
+}
+
+
 Template::Template( Loader & loader ) : Block( "main" ), loader( loader ) {
 }
 
