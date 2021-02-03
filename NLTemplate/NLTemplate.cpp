@@ -343,7 +343,7 @@ Loader::Result LoaderFile::load( const string & name ) {
     std::string content( (std::istreambuf_iterator<char>( input ) ),
                          (std::istreambuf_iterator<char>() ) );
 
-    return { true, content };
+    return { true, content, "" };
 }
 
 
@@ -359,7 +359,7 @@ Loader::Result LoaderMemory::load( const std::string & name ) {
         }
     }
 
-    return { false, nullptr, name + " not found." };
+    return { false, "", name + " not found." };
 }
 
 
